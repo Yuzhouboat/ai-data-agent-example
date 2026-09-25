@@ -1,0 +1,42 @@
+{
+  "env": {
+    "MLFLOW_CLAUDE_TRACING_ENABLED": "true",
+    "MLFLOW_TRACKING_URI": "https://mlflow-3-15.openroadmedia.io/",
+    "MLFLOW_EXPERIMENT_ID": "17",
+    "MLFLOW_EXPERIMENT_NAME": "yliu"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/install-plugins.py\"",
+            "timeout": 600,
+            "statusMessage": "Checking project plugins..."
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "aws-core@claude-plugins-official": true,
+    "mlflow-tracing@mlflow-plugins": true,
+    "aws-data-analytics@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "mlflow-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "mlflow/mlflow",
+        "sparsePaths": [
+          ".claude-plugin"
+        ]
+      }
+    }
+  },
+  "enabledMcpjsonServers": [
+    "mysql"
+  ]
+}
