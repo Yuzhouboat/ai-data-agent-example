@@ -8,14 +8,16 @@ to work with data sources through MCP servers and plugins.
 | File | Purpose |
 |---|---|
 | `.mcp.json` | Project MCP server: MySQL via [`@toolbox-sdk/server`](https://www.npmjs.com/package/@toolbox-sdk/server) (`@latest`, so it updates on each session start) |
-| `.claude/settings.json` | Enabled plugins (`aws-core`, `aws-data-analytics`, `mlflow-tracing`), the extra MLflow marketplace, MLflow tracing env, and the SessionStart hook |
+| `.claude/settings.json` | Enabled plugins (`aws-core`, `aws-data-analytics`, `mlflow-tracing`), the extra MLflow marketplace, MLflow tracing env (server URL + experiment), and the SessionStart hook |
 | `.claude/hooks/install-plugins.py` | SessionStart hook that installs any enabled plugin missing on this machine and updates the installed ones |
+| `.gitignore` | Keeps `.env*`, `settings.local.json`, CSV exports and Playwright MCP snapshots out of git |
 
 With this setup the agent can:
 
 - **MySQL** – query directly through the `mysql` MCP server.
 - **AWS / Redshift** – run AWS API calls (including the Redshift Data API) through the `aws-mcp` server bundled with the AWS plugins.
-- **MLflow** – trace agent sessions to MLflow via the `mlflow-tracing` plugin.
+- **MLflow** – trace agent sessions via the `mlflow-tracing` plugin to a self-hosted MLflow server
+  (`https://mlflow.yliumono.click`, served through a Cloudflare Tunnel and protected by MLflow's basic-auth login).
 
 ## Setup
 
@@ -31,8 +33,20 @@ With this setup the agent can:
    ```
 
 3. Make AWS credentials available (e.g. `aws login`, a profile, or `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`).
-4. Run `claude` in this folder. On first start the hook installs the plugins; run `/reload-plugins` (or restart) to load them.
-5. Approve the `mysql` MCP server when prompted.
+4. Traces go to `https://mlflow.yliumono.click` (experiment `yliu`, ID 2), which requires a login. Put it in
+   the git-ignored `.claude/settings.local.json` (or export the same variables):
+
+   ```json
+   {
+     "env": {
+       "MLFLOW_TRACKING_USERNAME": "...",
+       "MLFLOW_TRACKING_PASSWORD": "..."
+     }
+   }
+   ```
+
+5. Run `claude` in this folder. On first start the hook installs the plugins; run `/reload-plugins` (or restart) to load them.
+6. Approve the `mysql` MCP server when prompted.
 
 ## Keeping things up to date
 
@@ -42,4 +56,6 @@ With this setup the agent can:
 ## Notes
 
 - Credentials are never stored in the repo; `.mcp.json` reads them from environment variables.
-- Personal overrides go in `.claude/settings.local.json`, which is git-ignored.
+- Personal overrides (including the MLflow login) go in `.claude/settings.local.json`, which is git-ignored.
+- If traces don't show up, check the MLflow credentials: the server answers `401` without them.
+- Playwright MCP snapshots and screenshots (`.playwright-mcp/`) can capture secrets from pages, so they are git-ignored.

@@ -4,3 +4,6 @@ __pycache__/
 .env.*
 .claude/settings.local.json
 *.csv
+
+# Playwright MCP snapshots/screenshots (may contain secrets)
+.playwright-mcp/

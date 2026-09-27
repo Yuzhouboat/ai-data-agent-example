@@ -1,10 +1,13 @@
 {
   "env": {
     "MLFLOW_CLAUDE_TRACING_ENABLED": "true",
-    "MLFLOW_TRACKING_URI": "https://mlflow-3-15.openroadmedia.io/",
-    "MLFLOW_EXPERIMENT_ID": "17",
+    "MLFLOW_TRACKING_URI": "https://mlflow.yliumono.click",
+    "MLFLOW_EXPERIMENT_ID": "2",
     "MLFLOW_EXPERIMENT_NAME": "yliu"
   },
+  "enabledMcpjsonServers": [
+    "mysql"
+  ],
   "hooks": {
     "SessionStart": [
       {
@@ -35,8 +38,5 @@
         ]
       }
     }
-  },
-  "enabledMcpjsonServers": [
-    "mysql"
-  ]
+  }
 }
