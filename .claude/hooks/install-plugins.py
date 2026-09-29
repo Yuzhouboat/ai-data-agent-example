@@ -23,11 +23,16 @@ def load_json(path):
         return {}
 
 
-settings = [load_json(project_dir / ".claude" / name) for name in ("settings.json", "settings.local.json")]
+# Plugins enabled in settings.local.json (a local-only install of this kit) are installed
+# at local scope, so nothing gets written to the shared settings.json.
 enabled = {}
+scope_of = {}
 marketplaces = {}
-for s in settings:
-    enabled.update(s.get("enabledPlugins") or {})
+for scope, name in (("project", "settings.json"), ("local", "settings.local.json")):
+    s = load_json(project_dir / ".claude" / name)
+    for plugin, on in (s.get("enabledPlugins") or {}).items():
+        enabled[plugin] = on
+        scope_of[plugin] = scope
     marketplaces.update(s.get("extraKnownMarketplaces") or {})
 
 wanted = [p for p, on in enabled.items() if on is True and not p.endswith(("@synced", "@builtin"))]
@@ -62,12 +67,12 @@ for plugin in missing:
     market = plugin.split("@", 1)[1] if "@" in plugin else None
     source = (marketplaces.get(market) or {}).get("source") or {}
     if market and market not in known and source.get("source") == "github":
-        args = ["marketplace", "add", source["repo"], "--scope", "project"]
+        args = ["marketplace", "add", source["repo"], "--scope", scope_of[plugin]]
         if source.get("sparsePaths"):
             args += ["--sparse", *source["sparsePaths"]]
         run(*args)
         known[market] = True
-    success, output = run("install", plugin, "--scope", "project")
+    success, output = run("install", plugin, "--scope", scope_of[plugin])
     if success:
         ok.append(plugin)
     else:
@@ -79,7 +84,7 @@ for market in {p.split("@", 1)[1] for p in present if "@" in p}:
 
 updated = []
 for plugin in present:
-    success, output = run("update", plugin, "--scope", "project", "--json")
+    success, output = run("update", plugin, "--scope", scope_of[plugin], "--json")
     try:
         result = json.loads(output.splitlines()[0])
     except (IndexError, ValueError):

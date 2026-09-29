@@ -26,7 +26,8 @@
   "enabledPlugins": {
     "aws-core@claude-plugins-official": true,
     "mlflow-tracing@mlflow-plugins": true,
-    "aws-data-analytics@claude-plugins-official": true
+    "aws-data-analytics@claude-plugins-official": true,
+    "github@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "mlflow-plugins": {
