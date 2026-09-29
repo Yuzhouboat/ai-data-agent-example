@@ -15,7 +15,7 @@ updates the project to the latest kit.
 bash <(curl -fsSL https://raw.githubusercontent.com/Yuzhouboat/ai-data-agent-example/main/install.sh)
 git add .claude .mcp.json .gitignore && git commit -m "Add AI agent settings"
 ```
-Merges into `.claude/settings.json` and `.mcp.json`, copies the plugin hook, and adds
+Merges into `.claude/settings.json` and `.mcp.json`, copies the plugin hook, and (in a git repo) adds
 `.claude/settings.local.json` and `.playwright-mcp/` to `.gitignore`.
 
 **Local only** — for a repo you've cloned but don't want to add this to:
@@ -27,14 +27,27 @@ file it writes through that clone's `.git/info/exclude` — nothing shows in `gi
 tracks its own `.mcp.json`, the MCP servers are added at local scope (`claude mcp add-json --scope local`)
 instead of editing it.
 
-Both forms take an optional project path (default: the git repo you're in), and work the same from a clone
-of this repo: `./install.sh [--local] [project-dir]`. Then follow [Setup](#setup) from step 2 in that project.
+**Uninstall** — undoes either kind of install:
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Yuzhouboat/ai-data-agent-example/main/install.sh) --uninstall
+```
+Install records every change in `.claude/ai-kit.json` (committed in shared mode, hidden in local mode).
+Uninstall reads it back: uninstalls the kit's plugins for this project, removes its local-scope MCP servers,
+restores any settings the kit overwrote, deletes the files and folders it created and drops its
+`.gitignore` / `.git/info/exclude` lines. Settings you edited after installing are left alone and listed.
+To switch between shared and local, uninstall first.
+
+All forms take an optional project path (default: the git repo you're in, else the current directory) and
+work the same from a clone of this repo: `./install.sh [--local | --uninstall] [project-dir]`. The project
+doesn't need to be a git repo — outside one, there's just nothing to hide or ignore, and `--local` only
+differs from shared by using `settings.local.json`. A project that is a subfolder of a bigger repo works
+too. After installing, follow [Setup](#setup) from step 2 in that project.
 
 ## What's included
 
 | File | Purpose |
 |---|---|
-| `install.sh` | Adds the files below to another project (shared or `--local`) — see above |
+| `install.sh` | Adds the files below to another project (shared or `--local`), or removes them (`--uninstall`) — see above |
 | `.mcp.json` | Project MCP server: MySQL via [`@toolbox-sdk/server`](https://www.npmjs.com/package/@toolbox-sdk/server) (`@latest`, so it updates on each session start) |
 | `.claude/settings.json` | Enabled plugins (`aws-core`, `aws-data-analytics`, `mlflow-tracing`, `github`), the extra MLflow marketplace, MLflow tracing env (server URL + experiment), and the SessionStart hook |
 | `.claude/hooks/install-plugins.py` | SessionStart hook that installs any enabled plugin missing on this machine and updates the installed ones (at local scope for plugins enabled in `settings.local.json`) |
