@@ -27,7 +27,11 @@
     "aws-core@claude-plugins-official": true,
     "mlflow-tracing@mlflow-plugins": true,
     "aws-data-analytics@claude-plugins-official": true,
-    "github@claude-plugins-official": true
+    "github@claude-plugins-official": true,
+    "issue-fixer@yuzhou-agent-toolkit": false,
+    "mailbox-triage@yuzhou-agent-toolkit": false,
+    "address-pr-comment@yuzhou-agent-toolkit": false,
+    "airflow-agent@yuzhou-agent-toolkit": false
   },
   "extraKnownMarketplaces": {
     "mlflow-plugins": {
@@ -37,6 +41,12 @@
         "sparsePaths": [
           ".claude-plugin"
         ]
+      }
+    },
+    "yuzhou-agent-toolkit": {
+      "source": {
+        "source": "github",
+        "repo": "Yuzhouboat/yuzhou-agent-toolkit"
       }
     }
   }
